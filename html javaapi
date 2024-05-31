@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Finder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="controls">
+            <label for="radius">Radius (miles):</label>
+            <input type="number" id="radius" value="1">
+            <button id="find-food">Find Food</button>
+        </div>
+        <div id="map"></div>
+        <div id="food-container">
+            <!-- Food places will be dynamically inserted here -->
+        </div>
+        <div id="actions" class="hidden">
+            <button id="dislike">Dislike</button>
+            <button id="like">Like</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=PLUG_java_api_STRING&callback=initMap"></script>
+</body>
+</html>
