@@ -15,14 +15,19 @@
         </div>
         <div id="map"></div>
         <div id="food-container">
-            
+           
         </div>
         <div id="actions" class="hidden">
             <button id="dislike">Dislike</button>
             <button id="like">Like</button>
         </div>
+        <div id="liked-container" class="hidden">
+            <h2>Liked Food Places</h2>
+            
+        </div>
+        <button id="liked-food-button">Liked Food Places</button>
     </div>
     <script src="script.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=MYAPIKEY&libraries=places&callback=initMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=myapikey&libraries=places&callback=initMap"></script>
 </body>
 </html>
