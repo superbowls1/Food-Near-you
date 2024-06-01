@@ -1,10 +1,13 @@
 let map;
 let currentIndex = 0;
 let foodPlaces = [];
+let markers = [];
+
 const foodContainer = document.getElementById('food-container');
 const dislikeButton = document.getElementById('dislike');
 const likeButton = document.getElementById('like');
 const findFoodButton = document.getElementById('find-food');
+const radiusInput = document.getElementById('radius');
 const actions = document.getElementById('actions');
 
 function initMap() {
@@ -14,16 +17,33 @@ function initMap() {
     });
 }
 
+function getFoodType(types) {
+    const genericTypes = ['point_of_interest', 'establishment'];
+    for (let type of types) {
+        if (!genericTypes.includes(type)) {
+            return type.replace('_', ' ').capitalize();
+        }
+    }
+    return 'Unknown';
+}
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
 function loadFoodPlace(index) {
     foodContainer.innerHTML = '';
     if (index < foodPlaces.length) {
         const foodPlace = foodPlaces[index];
+        const foodType = getFoodType(foodPlace.types);
         const foodElement = document.createElement('div');
         foodElement.classList.add('food');
         foodElement.innerHTML = `
             <img src="${foodPlace.photoUrl}" alt="${foodPlace.name}">
             <h3>${foodPlace.name}</h3>
             <p>${foodPlace.vicinity}</p>
+            <p>Price: ${'$'.repeat(foodPlace.price_level || 0)}</p>
+            <p>Type: ${foodType}</p>
         `;
         foodContainer.appendChild(foodElement);
         map.setCenter(foodPlace.location);
@@ -80,8 +100,7 @@ function fetchNearbyFoodPlaces(lat, lng, radius) {
     const request = {
         location: new google.maps.LatLng(lat, lng),
         radius: radius,
-        type: ['restaurant', 'food'],
-        rankBy: google.maps.places.RankBy.DISTANCE
+        type: ['restaurant'] // Only fetch restaurants
     };
 
     service.nearbySearch(request, (results, status) => {
@@ -90,6 +109,8 @@ function fetchNearbyFoodPlaces(lat, lng, radius) {
             foodPlaces = results.map(place => ({
                 name: place.name,
                 vicinity: place.vicinity,
+                price_level: place.price_level,
+                types: place.types,
                 photoUrl: place.photos ? place.photos[0].getUrl({ maxWidth: 250, maxHeight: 150 }) : 'https://via.placeholder.com/250x150?text=No+Image',
                 location: place.geometry.location
             }));
@@ -105,8 +126,6 @@ function fetchNearbyFoodPlaces(lat, lng, radius) {
         }
     });
 }
-
-let markers = [];
 
 function addMarkers(places) {
     places.forEach(place => {
@@ -126,14 +145,4 @@ function clearMarkers() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
-
-    // Select the radius input element
-    const radiusInput = document.getElementById('radius');
-
-    // Check if the radius input element is successfully selected
-    if (radiusInput) {
-        console.log('Radius input element found:', radiusInput);
-    } else {
-        console.error('Radius input element not found.');
-    }
 });
