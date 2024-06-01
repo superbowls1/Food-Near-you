@@ -15,7 +15,7 @@
         </div>
         <div id="map"></div>
         <div id="food-container">
-            <!-- Food places will be dynamically inserted here -->
+            
         </div>
         <div id="actions" class="hidden">
             <button id="dislike">Dislike</button>
