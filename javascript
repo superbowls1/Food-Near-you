@@ -2,6 +2,7 @@ let map;
 let currentIndex = 0;
 let foodPlaces = [];
 let markers = [];
+let likedPlaces = []; 
 
 const foodContainer = document.getElementById('food-container');
 const dislikeButton = document.getElementById('dislike');
@@ -36,6 +37,7 @@ function loadFoodPlace(index) {
     if (index < foodPlaces.length) {
         const foodPlace = foodPlaces[index];
         const foodType = getFoodType(foodPlace.types);
+        const rating = foodPlace.rating || 'N/A';
         const foodElement = document.createElement('div');
         foodElement.classList.add('food');
         foodElement.innerHTML = `
@@ -44,6 +46,7 @@ function loadFoodPlace(index) {
             <p>${foodPlace.vicinity}</p>
             <p>Price: ${'$'.repeat(foodPlace.price_level || 0)}</p>
             <p>Type: ${foodType}</p>
+            <p>Rating: ${rating}</p>
         `;
         foodContainer.appendChild(foodElement);
         map.setCenter(foodPlace.location);
@@ -67,6 +70,9 @@ dislikeButton.addEventListener('click', () => {
 likeButton.addEventListener('click', () => {
     const foodElement = document.querySelector('.food');
     if (foodElement) {
+        const likedPlace = foodPlaces[currentIndex]; 
+        likedPlaces.push(likedPlace); 
+        updateLikedContainer(); 
         foodElement.style.transform = 'translateX(100%)';
         foodElement.style.opacity = '0';
         setTimeout(() => {
@@ -78,7 +84,7 @@ likeButton.addEventListener('click', () => {
 
 findFoodButton.addEventListener('click', () => {
     const radiusInMiles = radiusInput.value;
-    const radiusInMeters = radiusInMiles * 1609.34; // Convert miles to meters
+    const radiusInMeters = radiusInMiles * 1609.34; 
     console.log(`Radius in miles: ${radiusInMiles}`);
     console.log(`Radius in meters: ${radiusInMeters}`);
     if (navigator.geolocation) {
@@ -100,7 +106,7 @@ function fetchNearbyFoodPlaces(lat, lng, radius) {
     const request = {
         location: new google.maps.LatLng(lat, lng),
         radius: radius,
-        type: ['restaurant'] // Only fetch restaurants
+        type: ['restaurant'] 
     };
 
     service.nearbySearch(request, (results, status) => {
@@ -110,6 +116,7 @@ function fetchNearbyFoodPlaces(lat, lng, radius) {
                 name: place.name,
                 vicinity: place.vicinity,
                 price_level: place.price_level,
+                rating: place.rating,
                 types: place.types,
                 photoUrl: place.photos ? place.photos[0].getUrl({ maxWidth: 250, maxHeight: 150 }) : 'https://via.placeholder.com/250x150?text=No+Image',
                 location: place.geometry.location
@@ -129,7 +136,7 @@ function fetchNearbyFoodPlaces(lat, lng, radius) {
 
 function addMarkers(places) {
     places.forEach(place => {
-        const marker = new google.maps.Marker({
+        const marker = new  google.maps.Marker({
             position: place.location,
             map: map,
             title: place.name
@@ -146,3 +153,26 @@ function clearMarkers() {
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
 });
+
+const likedContainer = document.getElementById('liked-container');
+const likedFoodButton = document.getElementById('liked-food-button');
+
+likedFoodButton.addEventListener('click', () => {
+    likedContainer.classList.toggle('hidden');
+});
+
+function updateLikedContainer() {
+    likedContainer.innerHTML = '';
+    likedPlaces.forEach(place => {
+        const likedElement = document.createElement('div');
+        likedElement.classList.add('liked');
+        likedElement.innerHTML = `
+            <h3>${place.name}</h3>
+            <p>${place.vicinity}</p>
+            <p>Type: ${getFoodType(place.types)}</p>
+            <p>Rating: ${place.rating || 'N/A'}</p>
+            <p>Price Level: ${'$'.repeat(place.price_level || 0)}</p>
+        `;
+        likedContainer.appendChild(likedElement);
+    });
+}
